@@ -65,7 +65,7 @@ class ProthomAloSpider(scrapy.Spider):
             try:
                 dt = datetime.fromisoformat(published_iso.replace("Z", "+00:00"))
                 formatted = dt.strftime("%d.%m.%Y")
-                    published_date_bn = formatted.translate(self.DIGIT_MAP)
+                published_date_bn = formatted.translate(self.DIGIT_MAP)
             except Exception:
                 published_date_bn = published_iso.translate(self.DIGIT_MAP)
 
