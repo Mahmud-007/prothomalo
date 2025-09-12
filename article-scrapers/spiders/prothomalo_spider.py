@@ -65,7 +65,7 @@ class ProthomAloSpider(scrapy.Spider):
             try:
                 dt = datetime.fromisoformat(published_iso.replace("Z", "+00:00"))
                 formatted = dt.strftime("%d.%m.%Y")
-                published_date_bn = formatted.translate(self.DIGIT_MAP)
+                    published_date_bn = formatted.translate(self.DIGIT_MAP)
             except Exception:
                 published_date_bn = published_iso.translate(self.DIGIT_MAP)
 
@@ -87,4 +87,4 @@ class ProthomAloSpider(scrapy.Spider):
             "source": "প্রথম আলো",
             "domain": "prothomalo"
         }
-# scrapy crawl prothomalo -o prothomalo_02-09-2025_22-31.csv
+# scrapy crawl prothomalo -o ./csv/prothomalo_090920251104.csv
