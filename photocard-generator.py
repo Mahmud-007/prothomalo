@@ -92,7 +92,7 @@ SHIFT_SOURCE_DY_PERC  = -0.05
 SHIFT_PILL_DY_PERC    = 0.000   # category pill (extra on top of PILL_TOP_OFFSET_PERC)
 
 # ---------- Font sizing (start; will auto-shrink to fit boxes) ----------
-TITLE_FONT_START_PERC = 0.079; TITLE_FONT_MIN_PERC = 0.045
+TITLE_FONT_START_PERC = 0.055; TITLE_FONT_MIN_PERC = 0.035
 DATE_FONT_START_PERC  = 0.018; DATE_FONT_MIN_PERC  = 0.006
 SRC_FONT_START_PERC   = 0.018; SRC_FONT_MIN_PERC   = 0.006
 PILL_FONT_START_PERC  = 0.018; PILL_FONT_MIN_PERC  = 0.006
@@ -306,7 +306,7 @@ def render_category_pill(text: str, W: int, H: int, tmp_name: str = "pill") -> I
 
     style = TextStyle(
         font_path=Path("./fonts/NotoSansBengali_Condensed-Bold.ttf"),
-        color="#FFFFFF",
+        color=RED,
         font_px_start=font_px_start,
         font_px_min=font_px_min,
         line_height=1.0,
@@ -332,8 +332,8 @@ def render_category_pill(text: str, W: int, H: int, tmp_name: str = "pill") -> I
 html,body {{ margin:0; padding:0; background:rgba(0,0,0,0); }}
 .pill {{
   display:inline-flex; align-items:center; justify-content:center;
-  width:{100}px; height:{50}px; border-radius:{radius}px;
-  background:{RED}; color:#fff; font-family:'BanglaFont','Noto Sans Bengali','Hind Siliguri',sans-serif;
+  width:{pill_w}px; height:{pill_h}px; border-radius:{radius}px;
+   color:#fff; font-family:'BanglaFont','Noto Sans Bengali','Hind Siliguri',sans-serif;
   font-size:{style.font_px_start}px; line-height:1; padding:0;
 }}
 </style></head>
