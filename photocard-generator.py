@@ -35,75 +35,94 @@ except Exception:
 # =========================
 
 TEMPLATE_PATH = Path("./templates/version-1.png")
-CSV_PATH      = Path("./articles/prothomalo_120920251152.csv")
-OUT_DIR       = Path("./photocards/prothomalo_120920251152-photocard")
+CSV_PATH = Path("./articles/prothomalo.csv")
+OUT_DIR = Path("./photocards/prothomalo-photocard")
+FONT_PATH = Path("./fonts/HindSiliguri-Bold.ttf")
 
 # Save names: "index" or "title"
 NAMING_MODE = "index"
 
 # EXACT CSV KEYS you requested
 CSV_KEYS: Dict[str, List[str]] = {
-    "image":    ["article_image"],
-    "title":    ["article_title"],
-    "date":     ["published_date_bn"],
-    "source":   ["source"],
+    "image": ["article_image"],
+    "title": ["article_title"],
+    "date": ["published_date_bn"],
+    "source": ["source"],
     "category": ["category_bn"],
-    "cta":      [],  # not used
+    "cta": [],  # not used
 }
 
 # Photo window detection (auto). If you prefer fixed pixels, set to False and edit PHOTO_BOX_PIXELS.
 DETECT_PHOTO_BOX = True
-PHOTO_BOX_PIXELS: Tuple[int, int, int, int] = (120, 160, 1840, 1000)  # (l, t, r, b) used when DETECT_PHOTO_BOX=False
+PHOTO_BOX_PIXELS: Tuple[int, int, int, int] = (
+    120,
+    160,
+    1840,
+    1000,
+)  # (l, t, r, b) used when DETECT_PHOTO_BOX=False
 
 # Brand colors (tuned to your sample)
-RED  = "#C4161C"
+RED = "#C4161C"
 DARK = "#222222"
-MID  = "#4A4A4A"
+MID = "#4A4A4A"
+
 
 # ---------- Layout: base positions (percent of template W/H) ----------
 @dataclass
 class BoxPerc:
-    l: float; t: float; r: float; b: float
+    l: float
+    t: float
+    r: float
+    b: float
+
     def to_px(self, W: int, H: int) -> Tuple[int, int, int, int]:
-        return (int(self.l*W), int(self.t*H), int(self.r*W), int(self.b*H))
+        return (int(self.l * W), int(self.t * H), int(self.r * W), int(self.b * H))
+
 
 # Measured to your example; tweak these for coarse moves
-TITLE_BOX_PERC = BoxPerc(0.085, 0.66, 0.915, 0.76)   # red title
-DATE_BOX_PERC  = BoxPerc(0.40, 0.84, 0.60, 0.875)    # date
-SRC_BOX_PERC   = BoxPerc(0.36, 0.895, 0.64, 0.93)    # source
+TITLE_BOX_PERC = BoxPerc(
+    0.060, 0.62, 0.940, 0.80
+)  # (0.085, 0.66, 0.915, 0.76)   # red title
+DATE_BOX_PERC = BoxPerc(0.40, 0.84, 0.60, 0.875)  # date
+SRC_BOX_PERC = BoxPerc(0.36, 0.895, 0.64, 0.93)  # source
 
 # Divider line (centered)
-DIVIDER_Y_PERC     = 0.885
+DIVIDER_Y_PERC = 0.885
 DIVIDER_WIDTH_PERC = 0.28
 DIVIDER_THICK_PERC = 0.004
 
 # Category pill geometry (percent of W/H)
 PILL_TOP_OFFSET_PERC = -0.025  # relative to photo bottom; negative overlaps
-PILL_MIN_WIDTH_PERC  = 0.12
-PILL_H_PERC          = 0.045
-PILL_H_PAD_PERC      = 0.020
-PILL_RADIUS_PERC     = 0.022
+PILL_MIN_WIDTH_PERC = 0.12
+PILL_H_PERC = 0.045
+PILL_H_PAD_PERC = 0.020
+PILL_RADIUS_PERC = 0.022
 
 # ---------- Fine control: quick UP/DOWN nudges (percent of template height) ----------
 # Positive moves element DOWN; negative moves UP
-SHIFT_TITLE_DY_PERC   = -0.022   # e.g., +0.01 moves title down by 1% of H
-SHIFT_DATE_DY_PERC    = -0.03
-SHIFT_SOURCE_DY_PERC  = -0.05
-SHIFT_PILL_DY_PERC    = 0.000   # category pill (extra on top of PILL_TOP_OFFSET_PERC)
+SHIFT_TITLE_DY_PERC = -0.022  # e.g., +0.01 moves title down by 1% of H
+SHIFT_DATE_DY_PERC = -0.03
+SHIFT_SOURCE_DY_PERC = -0.05
+SHIFT_PILL_DY_PERC = 0.000  # category pill (extra on top of PILL_TOP_OFFSET_PERC)
 
 # ---------- Font sizing (start; will auto-shrink to fit boxes) ----------
-TITLE_FONT_START_PERC = 0.055; TITLE_FONT_MIN_PERC = 0.035
-DATE_FONT_START_PERC  = 0.018; DATE_FONT_MIN_PERC  = 0.006
-SRC_FONT_START_PERC   = 0.018; SRC_FONT_MIN_PERC   = 0.006
-PILL_FONT_START_PERC  = 0.018; PILL_FONT_MIN_PERC  = 0.006
+TITLE_FONT_START_PERC = 0.055
+TITLE_FONT_MIN_PERC = 0.035
+DATE_FONT_START_PERC = 0.018
+DATE_FONT_MIN_PERC = 0.006
+SRC_FONT_START_PERC = 0.018
+SRC_FONT_MIN_PERC = 0.006
+PILL_FONT_START_PERC = 0.018
+PILL_FONT_MIN_PERC = 0.006
 
-DEVICE_SCALE_FACTOR   = 1
-DEBUG_KEEP_TEXT_PNGS  = False
+DEVICE_SCALE_FACTOR = 1
+DEBUG_KEEP_TEXT_PNGS = False
 
 
 # =========================
 # =====  STYLES  ==========
 # =========================
+
 
 @dataclass
 class TextStyle:
@@ -192,17 +211,21 @@ def fit_cover(src_bgr: np.ndarray, tw: int, th: int) -> np.ndarray:
     resized = cv2.resize(src_bgr, (new_w, new_h), interpolation=cv2.INTER_AREA)
     x = (new_w - tw) // 2
     y = (new_h - th) // 2
-    return resized[y:y+th, x:x+tw]
+    return resized[y : y + th, x : x + tw]
 
 
 def build_overlay_mask(template_bgr: np.ndarray) -> np.ndarray:
     hsv = cv2.cvtColor(template_bgr, cv2.COLOR_BGR2HSV)
-    black_mask = cv2.inRange(hsv, np.array([0, 0, 0], np.uint8), np.array([179, 80, 60], np.uint8))
+    black_mask = cv2.inRange(
+        hsv, np.array([0, 0, 0], np.uint8), np.array([179, 80, 60], np.uint8)
+    )
     nonblack = cv2.bitwise_not(black_mask)
     return cv2.merge([nonblack, nonblack, nonblack])
 
 
-def composite_with_template(base_bgr: np.ndarray, template_bgr: np.ndarray, mask3: np.ndarray) -> np.ndarray:
+def composite_with_template(
+    base_bgr: np.ndarray, template_bgr: np.ndarray, mask3: np.ndarray
+) -> np.ndarray:
     return (base_bgr & (~mask3)) + (template_bgr & mask3)
 
 
@@ -227,40 +250,49 @@ def get_val(row: dict, keys: List[str]) -> str:
 
 # ---------- Playwright text rendering (copy to RAM) ----------
 
-def _render_text_png_to_file(text: str, max_width: int, style: TextStyle, out_path: Path):
+
+def _render_text_png_to_file(
+    text: str, max_width: int, style: TextStyle, out_path: Path
+):
     font_url = style.font_path.resolve().as_uri()
     text_html = html.escape(text)
     html_doc = f"""<!doctype html>
 <html><head><meta charset="utf-8">
 <style>
 @font-face {{
-  font-family: 'BanglaFont';
+  font-family: 'HindSiliguriBold';
   src: url('{font_url}') format('truetype');
 }}
 html,body {{ margin:0; padding:0; background:rgba(0,0,0,0); }}
 .wrap {{
-  width:{max_width - style.padding_px}px;
+  width:{max_width - 2*style.padding_px}px;
   padding:{style.padding_px}px;
-  font-family:'BanglaFont','Noto Sans Bengali','Hind Siliguri',sans-serif;
   font-size:{style.font_px_start}px;
   line-height:{style.line_height};
   color:{style.color};
   text-align:{style.text_align};
   white-space:normal;
+  font-style: normal;
+  font-weight: 500;  
   word-break:break-word;
 }}
 </style></head>
 <body><div class="wrap">{text_html}</div></body></html>"""
 
     browser = get_browser()
-    page = browser.new_page(viewport={"width": max_width, "height": 1600}, device_scale_factor=DEVICE_SCALE_FACTOR)
+    page = browser.new_page(
+        viewport={"width": max_width, "height": 1600},
+        device_scale_factor=DEVICE_SCALE_FACTOR,
+    )
     page.set_content(html_doc)
     page.wait_for_load_state("networkidle")
     page.locator(".wrap").screenshot(path=str(out_path), omit_background=True)
     page.close()
 
 
-def render_text_fit_box(text: str, box_w: int, box_h: int, style: TextStyle, tmp_name: str) -> Image.Image:
+def render_text_fit_box(
+    text: str, box_w: int, box_h: int, style: TextStyle, tmp_name: str
+) -> Image.Image:
     font_px = style.font_px_start
     tmp_path = Path(f"_{tmp_name}.png")
     while True:
@@ -279,16 +311,24 @@ def render_text_fit_box(text: str, box_w: int, box_h: int, style: TextStyle, tmp
             in_mem = on_disk.copy()
         if in_mem.height <= box_h or font_px <= style.font_px_min:
             if not DEBUG_KEEP_TEXT_PNGS:
-                try: os.remove(tmp_path)
-                except OSError: pass
+                try:
+                    os.remove(tmp_path)
+                except OSError:
+                    pass
             return in_mem
         font_px = max(style.font_px_min, font_px - 6)
 
 
-def paste_center(base_rgba: Image.Image, overlay_rgba: Image.Image, box_px: Tuple[int, int, int, int], dy_px: int = 0):
+def paste_center(
+    base_rgba: Image.Image,
+    overlay_rgba: Image.Image,
+    box_px: Tuple[int, int, int, int],
+    dy_px: int = 0,
+):
     l, t, r, b = box_px
     # apply vertical shift
-    t += dy_px; b += dy_px
+    t += dy_px
+    b += dy_px
     bw, bh = max(1, r - l), max(1, b - t)
     x = l + (bw - overlay_rgba.width) // 2
     y = t + (bh - overlay_rgba.height) // 2
@@ -296,16 +336,18 @@ def paste_center(base_rgba: Image.Image, overlay_rgba: Image.Image, box_px: Tupl
 
 
 # ---------- Category pill ----------
-def render_category_pill(text: str, W: int, H: int, tmp_name: str = "pill") -> Image.Image:
+def render_category_pill(
+    text: str, W: int, H: int, tmp_name: str = "pill"
+) -> Image.Image:
     pill_h = int(PILL_H_PERC * H)
     font_px_start = int(PILL_FONT_START_PERC * W)
-    font_px_min   = int(PILL_FONT_MIN_PERC * W)
-    min_w         = int(PILL_MIN_WIDTH_PERC * W)
-    hpad          = int(PILL_H_PAD_PERC * W)
-    radius        = max(6, int(PILL_RADIUS_PERC * W))
+    font_px_min = int(PILL_FONT_MIN_PERC * W)
+    min_w = int(PILL_MIN_WIDTH_PERC * W)
+    hpad = int(PILL_H_PAD_PERC * W)
+    radius = max(6, int(PILL_RADIUS_PERC * W))
 
     style = TextStyle(
-        font_path=Path("./fonts/NotoSansBengali_Condensed-Bold.ttf"),
+        font_path=FONT_PATH,
         color=RED,
         font_px_start=font_px_start,
         font_px_min=font_px_min,
@@ -319,10 +361,12 @@ def render_category_pill(text: str, W: int, H: int, tmp_name: str = "pill") -> I
     _render_text_png_to_file(text, max_width=W, style=style, out_path=tmp_text)
     with Image.open(tmp_text).convert("RGBA") as on_disk:
         text_img = on_disk.copy()
-    try: os.remove(tmp_text)
-    except OSError: pass
+    try:
+        os.remove(tmp_text)
+    except OSError:
+        pass
 
-    pill_w = max(min_w, text_img.width + 2*hpad)
+    pill_w = max(min_w, text_img.width + 2 * hpad)
 
     font_url = style.font_path.resolve().as_uri()
     html_doc = f"""<!doctype html>
@@ -341,7 +385,10 @@ html,body {{ margin:0; padding:0; background:rgba(0,0,0,0); }}
 
     tmp_pill = Path(f"_{tmp_name}.png")
     browser = get_browser()
-    page = browser.new_page(viewport={"width": pill_w, "height": pill_h}, device_scale_factor=DEVICE_SCALE_FACTOR)
+    page = browser.new_page(
+        viewport={"width": pill_w, "height": pill_h},
+        device_scale_factor=DEVICE_SCALE_FACTOR,
+    )
     page.set_content(html_doc)
     page.wait_for_load_state("networkidle")
     page.locator(".pill").screenshot(path=str(tmp_pill), omit_background=True)
@@ -349,8 +396,10 @@ html,body {{ margin:0; padding:0; background:rgba(0,0,0,0); }}
 
     with Image.open(tmp_pill).convert("RGBA") as on_disk2:
         pill_img = on_disk2.copy()
-    try: os.remove(tmp_pill)
-    except OSError: pass
+    try:
+        os.remove(tmp_pill)
+    except OSError:
+        pass
     return pill_img
 
 
@@ -358,10 +407,11 @@ html,body {{ margin:0; padding:0; background:rgba(0,0,0,0); }}
 # ========= MAIN ==========
 # =========================
 
+
 def main():
     if not TEMPLATE_PATH.is_file():
         raise FileNotFoundError(f"Template not found: {TEMPLATE_PATH}")
-    font_path = Path("./fonts/NotoSansBengali_Condensed-Bold.ttf")
+    font_path = FONT_PATH
     if not font_path.is_file():
         raise FileNotFoundError(f"Bangla TTF not found: {font_path}")
 
@@ -372,20 +422,47 @@ def main():
 
     # Convert perc boxes to px
     title_box_px = TITLE_BOX_PERC.to_px(W, H)
-    date_box_px  = DATE_BOX_PERC.to_px(W, H)
-    src_box_px   = SRC_BOX_PERC.to_px(W, H)
+    date_box_px = DATE_BOX_PERC.to_px(W, H)
+    src_box_px = SRC_BOX_PERC.to_px(W, H)
 
     # Divider px
     line_len = int(DIVIDER_WIDTH_PERC * W)
-    line_y   = int(DIVIDER_Y_PERC * H)
-    thick    = max(2, int(DIVIDER_THICK_PERC * H))
-    x1 = W//2 - line_len//2
-    x2 = W//2 + line_len//2
+    line_y = int(DIVIDER_Y_PERC * H)
+    thick = max(2, int(DIVIDER_THICK_PERC * H))
+    x1 = W // 2 - line_len // 2
+    x2 = W // 2 + line_len // 2
 
     # Styles (start font size scales with W)
-    title_style = TextStyle(font_path, RED,  int(TITLE_FONT_START_PERC*W), int(TITLE_FONT_MIN_PERC*W), 1.18, 4, "center", "0 2px 6px rgba(0,0,0,.25)")
-    date_style  = TextStyle(font_path, MID,  int(DATE_FONT_START_PERC*W),  int(DATE_FONT_MIN_PERC*W),  1.12,  4, "center", "0 1px 2px rgba(0,0,0,.10)")
-    src_style   = TextStyle(font_path, DARK, int(SRC_FONT_START_PERC*W),   int(SRC_FONT_MIN_PERC*W),   1.12,  4, "center", "0 1px 2px rgba(0,0,0,.10)")
+    title_style = TextStyle(
+        font_path,
+        RED,
+        int(TITLE_FONT_START_PERC * W),
+        int(TITLE_FONT_MIN_PERC * W),
+        1.18,
+        4,
+        "center",
+        "0 2px 6px rgba(0,0,0,.25)",
+    )
+    date_style = TextStyle(
+        font_path,
+        MID,
+        int(DATE_FONT_START_PERC * W),
+        int(DATE_FONT_MIN_PERC * W),
+        1.12,
+        4,
+        "center",
+        "0 1px 2px rgba(0,0,0,.10)",
+    )
+    src_style = TextStyle(
+        font_path,
+        DARK,
+        int(SRC_FONT_START_PERC * W),
+        int(SRC_FONT_MIN_PERC * W),
+        1.12,
+        4,
+        "center",
+        "0 1px 2px rgba(0,0,0,.10)",
+    )
 
     # Overlays & photo box
     overlay_src = template_bgr.copy()
@@ -401,11 +478,11 @@ def main():
     total = len(rows)
 
     for i, row in enumerate(rows, start=1):
-        img_url    = get_val(row, CSV_KEYS["image"])
+        img_url = get_val(row, CSV_KEYS["image"])
         title_text = get_val(row, CSV_KEYS["title"])
-        date_text  = get_val(row, CSV_KEYS["date"])
-        src_text   = get_val(row, CSV_KEYS["source"])
-        cat_text   = get_val(row, CSV_KEYS["category"])
+        date_text = get_val(row, CSV_KEYS["date"])
+        src_text = get_val(row, CSV_KEYS["source"])
+        cat_text = get_val(row, CSV_KEYS["category"])
 
         if not img_url:
             print(f"[{i}/{total}] skipped (no image url)")
@@ -423,7 +500,7 @@ def main():
             photo_bgr = load_cv(img_url)
             fitted = fit_cover(photo_bgr, pw, ph)
             base = template_bgr.copy()
-            base[py:py+ph, px:px+pw] = fitted
+            base[py : py + ph, px : px + pw] = fitted
 
             # 2) template overlay
             composed_bgr = composite_with_template(base, overlay_src, mask3)
@@ -434,21 +511,31 @@ def main():
             # Category pill: bottom-center of photo; add global shift
             if cat_text:
                 pill = render_category_pill(cat_text, W, H, tmp_name="pill")
-                pill_x = W//2 - pill.width//2
+                pill_x = W // 2 - pill.width // 2
                 pill_y = int(py + ph + (PILL_TOP_OFFSET_PERC + SHIFT_PILL_DY_PERC) * H)
                 card_rgba.alpha_composite(pill, (pill_x, pill_y))
 
             # Title
             if title_text:
-                tw, th = title_box_px[2]-title_box_px[0], title_box_px[3]-title_box_px[1]
-                title_png = render_text_fit_box(title_text, tw, th, title_style, "title_tmp")
+                tw, th = (
+                    title_box_px[2] - title_box_px[0],
+                    title_box_px[3] - title_box_px[1],
+                )
+                title_png = render_text_fit_box(
+                    title_text, tw, th, title_style, "title_tmp"
+                )
                 dy_px = int(SHIFT_TITLE_DY_PERC * H)
                 paste_center(card_rgba, title_png, title_box_px, dy_px=dy_px)
 
             # Date
             if date_text:
-                dw, dh = date_box_px[2]-date_box_px[0], date_box_px[3]-date_box_px[1]
-                date_png = render_text_fit_box(date_text, dw, dh, date_style, "date_tmp")
+                dw, dh = (
+                    date_box_px[2] - date_box_px[0],
+                    date_box_px[3] - date_box_px[1],
+                )
+                date_png = render_text_fit_box(
+                    date_text, dw, dh, date_style, "date_tmp"
+                )
                 dy_px = int(SHIFT_DATE_DY_PERC * H)
                 paste_center(card_rgba, date_png, date_box_px, dy_px=dy_px)
 
@@ -458,7 +545,7 @@ def main():
 
             # Source
             if src_text:
-                sw, sh = src_box_px[2]-src_box_px[0], src_box_px[3]-src_box_px[1]
+                sw, sh = src_box_px[2] - src_box_px[0], src_box_px[3] - src_box_px[1]
                 src_png = render_text_fit_box(src_text, sw, sh, src_style, "src_tmp")
                 dy_px = int(SHIFT_SOURCE_DY_PERC * H)
                 paste_center(card_rgba, src_png, src_box_px, dy_px=dy_px)

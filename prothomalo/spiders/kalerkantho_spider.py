@@ -91,3 +91,4 @@ class KalerKanthoSpider(scrapy.Spider):
             "source": "কালের কণ্ঠ",
             "domain": "kalerkantho"
         }
+# scrapy crawl prothomalo -o ./articles/prothomalo.csv

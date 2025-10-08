@@ -78,3 +78,4 @@ class KalbelaSpider(scrapy.Spider):
             "source": "কালবেলা",
             "domain": "kalbela"
         }
+# scrapy crawl kalbela -o ./articles/kalbela.csv
