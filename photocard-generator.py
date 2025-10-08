@@ -22,6 +22,7 @@ from pathlib import Path
 from typing import List, Optional, Tuple, Dict
 from PIL import Image, ImageDraw
 from playwright.sync_api import sync_playwright, Browser
+import sys
 
 # Optional AVIF
 try:
@@ -33,10 +34,27 @@ except Exception:
 # =========================
 # ======  CONFIG  =========
 # =========================
-
+def get_site():
+    # 1️⃣ try command-line arg
+    if "--site" in sys.argv:
+        idx = sys.argv.index("--site")
+        if idx + 1 < len(sys.argv):
+            return sys.argv[idx + 1].strip().lower()
+    # 2️⃣ fallback to environment variable
+    return os.getenv("SITE", "").strip().lower()
+SITE = get_site()
+print(f"INFO: SITE={SITE!r}")
 TEMPLATE_PATH = Path("./templates/version-1.png")
-CSV_PATH = Path("./articles/prothomalo.csv")
-OUT_DIR = Path("./photocards/prothomalo-photocard")
+# CSV_PATH = Path("./articles/kalbela.csv")
+# OUT_DIR = Path("./photocards/kalbela-photocard")
+if SITE == "prothomalo":
+	CSV_PATH = Path("./articles/prothomalo.csv")
+	OUT_DIR  = Path("./photocards/prothomalo-photocard")
+elif SITE == "kalbela":
+	CSV_PATH = Path("./articles/kalbela.csv")
+	OUT_DIR  = Path("./photocards/kalbela-photocard")
+else:
+	raise SystemExit("ERROR: SITE env not set or invalid. Use SITE=kalbela or SITE=prothomalo")
 FONT_PATH = Path("./fonts/HindSiliguri-Bold.ttf")
 
 # Save names: "index" or "title"
