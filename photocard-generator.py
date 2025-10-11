@@ -45,8 +45,7 @@ def get_site():
 SITE = get_site()
 print(f"INFO: SITE={SITE!r}")
 TEMPLATE_PATH = Path("./templates/version-1.png")
-# CSV_PATH = Path("./articles/kalbela.csv")
-# OUT_DIR = Path("./photocards/kalbela-photocard")
+
 if SITE == "prothomalo":
 	CSV_PATH = Path("./articles/prothomalo.csv")
 	OUT_DIR  = Path("./photocards/prothomalo-photocard")
@@ -54,7 +53,9 @@ elif SITE == "kalbela":
 	CSV_PATH = Path("./articles/kalbela.csv")
 	OUT_DIR  = Path("./photocards/kalbela-photocard")
 else:
-	raise SystemExit("ERROR: SITE env not set or invalid. Use SITE=kalbela or SITE=prothomalo")
+    CSV_PATH = Path("./articles/prothomalo.csv")
+    OUT_DIR = Path("./photocards/prothomalo-photocard")
+
 FONT_PATH = Path("./fonts/HindSiliguri-Bold.ttf")
 
 # Save names: "index" or "title"
@@ -273,6 +274,7 @@ def _render_text_png_to_file(
     text: str, max_width: int, style: TextStyle, out_path: Path
 ):
     font_url = style.font_path.resolve().as_uri()
+    print(font_url)
     text_html = html.escape(text)
     html_doc = f"""<!doctype html>
 <html><head><meta charset="utf-8">
@@ -439,7 +441,7 @@ def main():
     H, W = template_bgr.shape[:2]
 
     # Convert perc boxes to px
-    title_box_px = TITLE_BOX_PERC.to_px(W, H)
+    title_box_px = TITLE_BOX_PERC.to_px(W+5, H+5)
     date_box_px = DATE_BOX_PERC.to_px(W, H)
     src_box_px = SRC_BOX_PERC.to_px(W, H)
 
