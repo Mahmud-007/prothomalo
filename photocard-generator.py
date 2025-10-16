@@ -392,12 +392,12 @@ def render_category_pill(
     html_doc = f"""<!doctype html>
 <html><head><meta charset="utf-8">
 <style>
-@font-face {{ font-family:'BanglaFont'; src:url('{font_url}') format('truetype'); }}
+@font-face {{ font-family: 'HindSiliguriBold'; src:url('{font_url}') format('truetype'); }}
 html,body {{ margin:0; padding:0; background:rgba(0,0,0,0); }}
 .pill {{
   display:inline-flex; align-items:center; justify-content:center;
   width:{pill_w}px; height:{pill_h}px; border-radius:{radius}px;
-   color:#fff; font-family:'BanglaFont','Noto Sans Bengali','Hind Siliguri',sans-serif;
+   color:#fff; font-family: 'HindSiliguriBold';
   font-size:{style.font_px_start}px; line-height:1; padding:0;
 }}
 </style></head>
